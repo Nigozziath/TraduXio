@@ -10,37 +10,45 @@ function(o) {
     return text.substr(begin, SIZE).toLowerCase();
   }
 
-  const WORD_MATCHER = new RegExp(regex,"g");
 
-  if (o.translations) {
-    var nb_translations=Object.keys(o.translations).length;
+  for (var i in o.text) {
+      send_text(o.text[i],o.language,{unit:i});
+  }
+  for (var t in o.translations) {
+    var translation = o.translations[t];
+    for (var i in translation.text) {
+      send_text(translation.text[i],translation.language,{unit:i,translation:t});
+    }
+  }
+  if (o.glossary)
+    for (src_language in o.glossary) {
+      for (src_sentence in o.glossary[src_language]) {
+        for (target_language in o.glossary[src_language][src_sentence]) {
+          var target_sentence=o.glossary[src_language][src_sentence][target_language];
+          var glossary_entry={
+            src:{language:src_language,sentence:src_sentence},
+            target:{language:target_language,sentence:target_sentence}
+          };
+          send_text(src_sentence,src_language,{glossary_entry:glossary_entry});
 
-    if (nb_translations) {
-      if (o.language) for (var i in o.text) {
-	var text = o.text[i];
-	if (text && text.length<1024) {
-	  var match;
-	  while ((match = WORD_MATCHER.exec(text))) {
-	    var begin = match.index;
-	    emit([o.language, format(text, begin)], {unit: i, char: begin});
-	  }
-	}
+          var target=glossary_entry.target;
+          glossary_entry.target=glossary_entry.src;
+          glossary_entry.src=target;
+          send_text(target_sentence,target_language,{glossary_entry:glossary_entry});
+        }
       }
-      for (var t in o.translations) {
-	var translation = o.translations[t];
-	if (translation.language) for (var i in translation.text) {
-	  var text = translation.text[i];
-	  if (text && text.length<1024) {
-	    var match;
-	    while ((match = WORD_MATCHER.exec(text))) {
-	      var begin = match.index;
-	      emit(
-		[translation.language, format(text, begin)], 
-		{unit: i, char: begin, translation: t}
-	      );
-	    }
-	  }
-	}
+    }
+
+  function send_text(text,language,object) {
+    const WORD_MATCHER = new RegExp(regex,"g");
+    if (text) {
+      var match;
+      while ((match = WORD_MATCHER.exec(text))) {
+        var begin = match.index;
+        object.char=begin;
+        emit(
+          [language, format(text, begin)], object
+        );
       }
     }
   }

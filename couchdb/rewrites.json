@@ -47,6 +47,13 @@
   "to": "_update/work/:id",
   "method": "PUT"
 },{
+  "from": "glossary/:id",
+  "to": "_update/glossary/:id",
+  "method": "POST"
+},{
+  "from": "works/work/:id/glossary/:src_language/:src_sentence/:target_language",
+  "to": "_update/glossary/:id"
+},{
   "from": "",
   "to": "_show/welcome"
 }]

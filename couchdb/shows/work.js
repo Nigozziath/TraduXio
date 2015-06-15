@@ -87,17 +87,22 @@ function(o, req) {
 	  opened: (opened_versions.indexOf(t)!== -1)
     });
   }
+  data.addtrad="Traduction :";
+  data.send="Cr&eacute;er";
+  data.deleteMsg="Supprimer le texte et toutes ses traductions";
+  data.glossaryEntry="Ajouter une entrée du glossaire";
   data.rows=hexapla.getRows();
   data.name="work";
   data.css=true;
   data.script=true;
-  data.scripts=["jquery.selection"];
+  data.scripts=["jquery.selection","jquery.highlight"];
   data.language=data.work_language;
   data.prefix="..";
   data.i_edit=data.i18n.i_edit;
   data.i_hide=data.i18n.i_hide;
   data.i_edit_license=data.i18n.i_edit_license;
   data.i_all_rights_reserved=data.i18n.i_all_rights_reserved;
+  data.glossary=o.glossary?JSON.stringify(o.glossary):"[]";
  
   return Mustache.to_html(this.templates.work, data, this.templates.partials);
 }
